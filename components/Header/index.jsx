@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import styles from './Header.module.scss';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import LocalMallOutlinedIcon from '@mui/icons-material/LocalMallOutlined';
@@ -9,9 +9,12 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { DrawerCart } from '../Drawer';
 import { AuthDialog } from '../AuthDialog';
+import { DataContext } from '../../store/GlobalState';
+import Cookies from 'js-cookie';
 
 export const Header = () => {
-  const isAuth = false;
+  const { state, dispatch } = useContext(DataContext);
+  const { auth, notify } = state;
 
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const toggleDrawer = () => {
@@ -21,6 +24,17 @@ export const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = React.useState(false);
   const toggleAuthDialog = () => {
     setAuthDialogOpen(!authDialogOpen);
+  };
+
+  useEffect(() => {
+    if (notify.success) setAuthDialogOpen(false);
+  }, [authDialogOpen, notify]);
+
+  const handleLogout = () => {
+    Cookies.remove('refreshtoken', { path: 'api/auth/accessToken' });
+    localStorage.removeItem('firstLogin');
+    dispatch({ type: 'AUTH', payload: {} });
+    dispatch({ type: 'NOTIFY', payload: { success: 'Выход из системы' } });
   };
 
   return (
@@ -33,7 +47,7 @@ export const Header = () => {
             </a>
           </Link>
           <ul className={styles.actions}>
-            {isAuth ? (
+            {Object.keys(auth).length !== 0 ? (
               <>
                 <li onClick={toggleDrawer}>
                   <LocalMallOutlinedIcon />
@@ -49,11 +63,15 @@ export const Header = () => {
                 <li>
                   <Link href="/profile">
                     <a>
-                      <AccountCircleOutlinedIcon />
+                      {auth.user.avatar ? (
+                        <img className={styles.avatar} src={auth.user.avatar} alt="avatar" />
+                      ) : (
+                        <AccountCircleOutlinedIcon />
+                      )}
                     </a>
                   </Link>
                 </li>
-                <li>
+                <li onClick={handleLogout}>
                   <LogoutOutlinedIcon />
                 </li>
               </>

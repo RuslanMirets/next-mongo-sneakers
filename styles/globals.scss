@@ -56,3 +56,9 @@ button {
   max-width: 960px;
   margin: 0 auto;
 }
+
+.disabled {
+  background: #bcbcbc !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}

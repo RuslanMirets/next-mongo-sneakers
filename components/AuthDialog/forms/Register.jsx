@@ -2,16 +2,17 @@ import React, { useContext, useState } from 'react';
 import { Button } from '../../buttons/ButtonBlue';
 import { FormField } from '../../FormField';
 import styles from './Forms.module.scss';
-import { DataContext } from '../../../store/GlobalState';
 import { postData } from '../../../utils/fetchData';
 import validation from '../../../utils/validations';
+import { DataContext } from '../../../store/GlobalState';
+import { useForm } from 'react-hook-form';
 
 export const RegisterForm = ({ onOpenLogin }) => {
   const initialState = { firstName: '', lastName: '', email: '', password: '' };
   const [userData, setUserData] = useState(initialState);
   const { firstName, lastName, email, password } = userData;
 
-  const [state, dispatch] = useContext(DataContext);
+  const { state, dispatch } = useContext(DataContext);
 
   const handleChangeInput = (e) => {
     const { name, value } = e.target;
@@ -19,8 +20,10 @@ export const RegisterForm = ({ onOpenLogin }) => {
     dispatch({ type: 'NOTIFY', payload: {} });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const { handleSubmit, formState } = useForm();
+  const { isSubmitting } = formState;
+
+  const onSubmit = async () => {
     const errMsg = validation(firstName, lastName, email, password);
     if (errMsg) return dispatch({ type: 'NOTIFY', payload: { error: errMsg } });
 
@@ -35,7 +38,7 @@ export const RegisterForm = ({ onOpenLogin }) => {
   return (
     <>
       <h2>Регистрация</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <FormField
           name="firstName"
           label="Имя"
@@ -71,7 +74,9 @@ export const RegisterForm = ({ onOpenLogin }) => {
               Войти
             </div>
           </div>
-          <Button type="submit">Регистрация</Button>
+          <Button className={isSubmitting && 'disabled'} type="submit">
+            Регистрация
+          </Button>
         </div>
       </form>
     </>
