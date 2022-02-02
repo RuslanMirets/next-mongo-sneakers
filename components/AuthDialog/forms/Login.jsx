@@ -1,20 +1,11 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { LoginFormSchema } from '../../../utils/validations';
 import { Button } from '../../buttons/ButtonBlue';
 import { FormField } from '../../FormField';
 import styles from './Forms.module.scss';
 
 export const LoginForm = ({ onOpenRegister }) => {
-  const form = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(LoginFormSchema),
-    reValidateMode: 'onChange',
-  });
-
   return (
-    <FormProvider {...form}>
+    <>
       <h2>Авторизация</h2>
       <form>
         <FormField name="email" label="Email" type="email" />
@@ -28,6 +19,6 @@ export const LoginForm = ({ onOpenRegister }) => {
           <Button>Войти</Button>
         </div>
       </form>
-    </FormProvider>
+    </>
   );
 };

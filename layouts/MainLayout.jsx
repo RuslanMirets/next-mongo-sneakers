@@ -3,6 +3,7 @@ import Head from 'next/head';
 import React from 'react';
 import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
+import Notify from '../components/Notify';
 
 export const MainLayout = ({ children, title, description, keywords }) => {
   return (
@@ -21,6 +22,7 @@ export const MainLayout = ({ children, title, description, keywords }) => {
       </Head>
       <div className="wrapper">
         <Header />
+        <Notify />
         <main className="main">{children}</main>
         <Footer />
       </div>

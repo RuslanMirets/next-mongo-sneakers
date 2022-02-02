@@ -1,26 +1,69 @@
-import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { RegisterFormSchema } from '../../../utils/validations';
+import React, { useContext, useState } from 'react';
 import { Button } from '../../buttons/ButtonBlue';
 import { FormField } from '../../FormField';
 import styles from './Forms.module.scss';
+import { DataContext } from '../../../store/GlobalState';
+import { postData } from '../../../utils/fetchData';
+import validation from '../../../utils/validations';
 
 export const RegisterForm = ({ onOpenLogin }) => {
-  const form = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(RegisterFormSchema),
-    reValidateMode: 'onChange',
-  });
+  const initialState = { firstName: '', lastName: '', email: '', password: '' };
+  const [userData, setUserData] = useState(initialState);
+  const { firstName, lastName, email, password } = userData;
+
+  const [state, dispatch] = useContext(DataContext);
+
+  const handleChangeInput = (e) => {
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
+    dispatch({ type: 'NOTIFY', payload: {} });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errMsg = validation(firstName, lastName, email, password);
+    if (errMsg) return dispatch({ type: 'NOTIFY', payload: { error: errMsg } });
+
+    dispatch({ type: 'NOTIFY', payload: { loading: true } });
+
+    const res = await postData('auth/register', userData);
+    if (res.error) return dispatch({ type: 'NOTIFY', payload: { error: res.error } });
+
+    return dispatch({ type: 'NOTIFY', payload: { success: res.msg } });
+  };
 
   return (
-    <FormProvider {...form}>
+    <>
       <h2>Регистрация</h2>
-      <form>
-        <FormField name="firstName" label="Имя" type="text" />
-        <FormField name="lastName" label="Фамилия" type="text" />
-        <FormField name="email" label="Email" type="email" />
-        <FormField name="password" label="Пароль" type="password" />
+      <form onSubmit={handleSubmit}>
+        <FormField
+          name="firstName"
+          label="Имя"
+          type="text"
+          value={firstName}
+          onChange={handleChangeInput}
+        />
+        <FormField
+          name="lastName"
+          label="Фамилия"
+          type="text"
+          value={lastName}
+          onChange={handleChangeInput}
+        />
+        <FormField
+          name="email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={handleChangeInput}
+        />
+        <FormField
+          name="password"
+          label="Пароль"
+          type="password"
+          value={password}
+          onChange={handleChangeInput}
+        />
         <div className={styles.actions}>
           <div className={styles.action}>
             Есть аккаунт?
@@ -28,9 +71,9 @@ export const RegisterForm = ({ onOpenLogin }) => {
               Войти
             </div>
           </div>
-          <Button>Регистрация</Button>
+          <Button type="submit">Регистрация</Button>
         </div>
       </form>
-    </FormProvider>
+    </>
   );
 };

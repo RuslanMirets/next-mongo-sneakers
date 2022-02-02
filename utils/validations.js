@@ -1,17 +1,19 @@
-import * as yup from 'yup';
+const validation = (firstName, lastName, email, password) => {
+  if (!firstName || !lastName || !email || !password) return 'Заполните все поля';
 
-export const LoginFormSchema = yup.object().shape({
-  email: yup.string().email('Неверная почта').required('Почта обязательна'),
-  password: yup
-    .string()
-    .min(6, 'Пароль должен быть не менее 6 символов')
-    .required('Пароль обязательный'),
-});
+  if (!firstName) return 'Заполните имя';
 
-export const RegisterFormSchema = yup
-  .object()
-  .shape({
-    firstName: yup.string().required('Имя обязательно'),
-    lastName: yup.string().required('Фамилия обязательна'),
-  })
-  .concat(LoginFormSchema);
+  if (!lastName) return 'Заполните фамилию';
+
+  if (!validateEmail(email)) return 'Некорректный email';
+
+  if (password.length < 6) return 'Пароль должен быть больше 6 символов';
+};
+
+function validateEmail(email) {
+  const re =
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+
+export default validation;
