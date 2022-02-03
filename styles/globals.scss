@@ -35,6 +35,10 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+img {
+  width: 100%;
+  height: auto;
+}
 .wrapper {
   display: flex;
   flex-direction: column;
